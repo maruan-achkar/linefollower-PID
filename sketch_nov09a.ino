@@ -6,11 +6,6 @@
 #define PINENA 3
 #define PINENB 6
 
-// Portas led rgb
-#define PINLEDR 9
-#define PINLEDG 11
-#define PINLEDB 10
-
 // Portas sensor QTR
 #define S1 A0
 #define S2 A1
@@ -22,15 +17,15 @@
 // Valores de ajustes para o seguidor de linha MIF
 #define TRESHOLD 500                       // Valor de referencia para cor da linha branca
 #define SPEED0 255                          // Valor de 0 a 255 para velocidade com a seguinte leitura do sensor (0 0 1 1 0 0) 
-#define SPEED1 220                          // Valor de 0 a 255 para velocidade com a seguinte leitura do sensor (0 0 1 1 1 0) 
+#define SPEED1 255                          // Valor de 0 a 255 para velocidade com a seguinte leitura do sensor (0 0 1 1 1 0) 
 
-#define SPEED2 150                          // Valor de 0 a 255 para velocidade com a seguinte leitura do sensor (0 0 0 1 0 0) 
-#define SPEED3 100                          // Valor de 0 a 255 para velocidade com a seguinte leitura do sensor (0 0 0 1 1 0)  
-#define SPEED4 80                          // Valor de 0 a 255 para velocidade com a seguinte leitura do sensor (0 0 0 1 1 1) 
+#define SPEED2 255                          // Valor de 0 a 255 para velocidade com a seguinte leitura do sensor (0 0 0 1 0 0) 
+#define SPEED3 255                          // Valor de 0 a 255 para velocidade com a seguinte leitura do sensor (0 0 0 1 1 0)  
+#define SPEED4 255                          // Valor de 0 a 255 para velocidade com a seguinte leitura do sensor (0 0 0 1 1 1) 
 
-#define SPEED5 50                            // Valor de 0 a 255 para velocidade com a seguinte leitura do sensor (0 0 0 0 1 0) 
-#define SPEED6 150                            // Valor de 0 a 255 para velocidade com a seguinte leitura do sensor (0 0 0 0 1 1) 
-#define SPEED7 200                          // Valor de 0 a 255 para velocidade com a seguinte leitura do sensor (0 0 0 0 0 1) 
+#define SPEED5 255                            // Valor de 0 a 255 para velocidade com a seguinte leitura do sensor (0 0 0 0 1 0) 
+#define SPEED6 255                            // Valor de 0 a 255 para velocidade com a seguinte leitura do sensor (0 0 0 0 1 1) 
+#define SPEED7 255                          // Valor de 0 a 255 para velocidade com a seguinte leitura do sensor (0 0 0 0 0 1) 
 
 #define RUNTIME 100000                      // Valor para executar o percurso 
 
@@ -43,17 +38,7 @@ void setup() {
 }
 
 void loop() {
-  // TESTE 1°: leituta sensor
- // int s[6];
-  //readSensors(true, s);
-  // TESTE 2°: motor esquerda
-  //motorOption('4',255,255);
-   //TESTE 3°: motor direita
- // motorOption('6', 255, 255);
-  // TESTE 4°: seguidor de linha
   followLineMEF();
-  // TESTE 5°: teste led RGB
-  //rgbControl(0,0,255,0);
 }
 
 void motorControl(int speedLeft, int speedRight) {
@@ -148,15 +133,15 @@ void readSensors(bool readSerial, int *sensors) {
   sensors[5] = analogRead(S6);
   if (readSerial) {
     Serial.print(sensors[0]);
-    Serial.print(' ');
+    Serial.print('Sensor 0');
     Serial.print(sensors[1]);
-    Serial.print(' ');
+    Serial.print('Sensor 1');
     Serial.print(sensors[2]);
-    Serial.print(' ');
+    Serial.print('Sensor 2');
     Serial.print(sensors[3]);
-    Serial.print(' ');
+    Serial.print('Sensor 3');
     Serial.print(sensors[4]);
-    Serial.print(' ');
+    Serial.print('Sensor 4');
     Serial.println(sensors[5]);
   }
 }
