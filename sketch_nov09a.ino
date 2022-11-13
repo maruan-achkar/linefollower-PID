@@ -17,17 +17,25 @@
 // Valores de ajustes para o seguidor de linha MIF
 #define TRESHOLD 500                       // Valor de referencia para cor da linha branca
 #define SPEED0 255                          // Valor de 0 a 255 para velocidade com a seguinte leitura do sensor (0 0 1 1 0 0) 
-#define SPEED1 255                          // Valor de 0 a 255 para velocidade com a seguinte leitura do sensor (0 0 1 1 1 0) 
+#define SPEED1 200                          // Valor de 0 a 255 para velocidade com a seguinte leitura do sensor (0 0 1 1 1 0) 
 
-#define SPEED2 255                          // Valor de 0 a 255 para velocidade com a seguinte leitura do sensor (0 0 0 1 0 0) 
-#define SPEED3 255                          // Valor de 0 a 255 para velocidade com a seguinte leitura do sensor (0 0 0 1 1 0)  
-#define SPEED4 255                          // Valor de 0 a 255 para velocidade com a seguinte leitura do sensor (0 0 0 1 1 1) 
+#define SPEED2 180                          // Valor de 0 a 255 para velocidade com a seguinte leitura do sensor (0 0 0 1 0 0) 
+#define SPEED3 160                          // Valor de 0 a 255 para velocidade com a seguinte leitura do sensor (0 0 0 1 1 0)  
+#define SPEED4 140                          // Valor de 0 a 255 para velocidade com a seguinte leitura do sensor (0 0 0 1 1 1) 
 
-#define SPEED5 255                            // Valor de 0 a 255 para velocidade com a seguinte leitura do sensor (0 0 0 0 1 0) 
-#define SPEED6 255                            // Valor de 0 a 255 para velocidade com a seguinte leitura do sensor (0 0 0 0 1 1) 
-#define SPEED7 255                          // Valor de 0 a 255 para velocidade com a seguinte leitura do sensor (0 0 0 0 0 1) 
+#define SPEED5 120                            // Valor de 0 a 255 para velocidade com a seguinte leitura do sensor (0 0 0 0 1 0) 
+#define SPEED6 100                            // Valor de 0 a 255 para velocidade com a seguinte leitura do sensor (0 0 0 0 1 1) 
+#define SPEED7 80                          // Valor de 0 a 255 para velocidade com a seguinte leitura do sensor (0 0 0 0 0 1) 
 
 #define RUNTIME 100000                      // Valor para executar o percurso 
+
+int Ki = 0;
+int Kp = 35;                                //variavel
+int Kd = 35;
+int I = 0, P = 0, D = 0, PID = 0;
+int velesq = 0, veldir = 0;
+int erro = 0, erro_anterior = 0;
+
 
 void setup() {
   Serial.begin(9600);
@@ -162,61 +170,78 @@ void followLineMEF(void) {
     // leitura do sensor (1 1 1 1 1 1)
     if (s[0] <= TRESHOLD && s[1] <= TRESHOLD && s[2] <= TRESHOLD && s[3] <= TRESHOLD && s[4] <= TRESHOLD && s[5] <= TRESHOLD) {
       motorOption('8', SPEED0, SPEED0);
+      erro = 0;
       // leitura do sensor (0 1 1 1 1 0)
     } else if ( s[0] >= TRESHOLD && s[1] <= TRESHOLD && s[2] <= TRESHOLD && s[3] <= TRESHOLD && s[4] <= TRESHOLD && s[5] >= TRESHOLD) {
       motorOption('8', SPEED0, SPEED0);
+      erro = 0;
       // leitura do sensor (0 0 1 1 0 0)
     } else if ( s[0] >= TRESHOLD && s[1] >= TRESHOLD && s[2] <= TRESHOLD && s[3] <= TRESHOLD && s[4] >= TRESHOLD && s[5] >= TRESHOLD) {
       motorOption('8', SPEED0, SPEED0);
+      erro = 0;
 
       // leitura do sensor (0 1 1 1 0 0)
     } else if (s[0] >= TRESHOLD && s[1] <= TRESHOLD && s[2] <= TRESHOLD && s[3] <= TRESHOLD && s[4] >= TRESHOLD && s[5] >= TRESHOLD) {
       motorOption('8', SPEED0, SPEED1);
+      erro = 1;
       // leitura do sensor (0 0 1 1 1 0)
     } else if (s[0] >= TRESHOLD && s[1] >= TRESHOLD && s[2] <= TRESHOLD && s[3] <= TRESHOLD && s[4] <= TRESHOLD && s[5] >= TRESHOLD ) {
       motorOption('8', SPEED1, SPEED0);
+      erro = -1;
 
       // leitura do sensor (0 0 1 0 0 0)
     } else if (s[0] >= TRESHOLD && s[1] >= TRESHOLD && s[2] <= TRESHOLD && s[3] >= TRESHOLD && s[4] >= TRESHOLD && s[5] >= TRESHOLD) {
       motorOption('8', SPEED0, SPEED2);
+      erro = 2;
       // leitura do sensor (0 0 0 1 0 0)
     } else if (s[0] >= TRESHOLD && s[1] >= TRESHOLD && s[2] >= TRESHOLD && s[3] <= TRESHOLD && s[4] >= TRESHOLD && s[5] >= TRESHOLD ) {
       motorOption('8', SPEED2, SPEED0);
+      erro = -2;
 
       // leitura do sensor (0 1 1 0 0 0)
     } else if (s[0] >= TRESHOLD && s[1] <= TRESHOLD && s[2] <= TRESHOLD && s[3] >= TRESHOLD && s[4] >= TRESHOLD && s[5] >= TRESHOLD) {
       motorOption('8', SPEED0, SPEED3);
+      erro = 3;
       // leitura do sensor (0 0 0 1 1 0)
     } else if (s[0] >= TRESHOLD && s[1] >= TRESHOLD && s[2] >= TRESHOLD && s[3] <= TRESHOLD && s[4] <= TRESHOLD && s[5] >= TRESHOLD) {
       motorOption('8', SPEED3, SPEED0);
+      erro = -3;
 
       // leitura do sensor (1 1 1 0 0 0)
     } else if (s[0] <= TRESHOLD && s[1] <= TRESHOLD && s[2] <= TRESHOLD && s[3] >= TRESHOLD && s[4] >= TRESHOLD && s[5] >= TRESHOLD) {
       motorOption('8', SPEED0, SPEED4);
+      erro = 4;
       // leitura do sensor (0 0 0 1 1 1)
     } else if (s[0] >= TRESHOLD && s[1] >= TRESHOLD && s[2] >= TRESHOLD && s[3] <= TRESHOLD && s[4] <= TRESHOLD && s[5] <= TRESHOLD) {
       motorOption('8', SPEED4, SPEED0);
+      erro = -4;
 
       // leitura do sensor (0 1 0 0 0 0)
     } else if (s[0] >= TRESHOLD && s[1] <= TRESHOLD && s[2] >= TRESHOLD && s[3] >= TRESHOLD && s[4] >= TRESHOLD && s[5] >= TRESHOLD) {
       motorOption('8', SPEED0, SPEED5);
+      erro = 5;
       // leitura do sensor (0 0 0 0 1 0)
     } else if (s[0] >= TRESHOLD && s[1] >= TRESHOLD && s[2] >= TRESHOLD && s[3] >= TRESHOLD && s[4] <= TRESHOLD && s[5] >= TRESHOLD) {
       motorOption('8', SPEED5, SPEED0);
+      erro = -5;
 
       // leitura do sensor (1 1 0 0 0 0)
     } else if (s[0] <= TRESHOLD && s[1] <= TRESHOLD && s[2] >= TRESHOLD && s[3] >= TRESHOLD && s[4] >= TRESHOLD && s[5] >= TRESHOLD) {
       motorOption('8', SPEED0, SPEED6);
+      erro = 6;
       // leitura do sensor (0 0 0 0 1 0)
     } else if (s[0] >= TRESHOLD && s[1] >= TRESHOLD && s[2] >= TRESHOLD && s[3] >= TRESHOLD && s[4] <= TRESHOLD && s[5] >= TRESHOLD) {
       motorOption('8', SPEED6, SPEED0);
+      erro = -6;
 
       // leitura do sensor (1 0 0 0 0 0)
     } else if (s[0] <= TRESHOLD && s[1] >= TRESHOLD && s[2] >= TRESHOLD && s[3] >= TRESHOLD && s[4] >= TRESHOLD && s[5] >= TRESHOLD) {
       motorOption('6', SPEED7, SPEED7);
+      erro = 7;
       // leitura do sensor (0 0 0 0 0 1)
     } else if (s[0] >= TRESHOLD && s[1] >= TRESHOLD && s[2] >= TRESHOLD && s[3] >= TRESHOLD && s[4] >= TRESHOLD && s[5] <= TRESHOLD) {
       motorOption('4', SPEED7, SPEED7);
+      erro = -7;
     }
   }
 }
