@@ -245,3 +245,21 @@ void followLineMEF(void) {
     }
   }
 }
+
+void calcular_PID(){
+  if(erro==0){
+    I = 0;
+  }
+  P = erro;
+  I = I + erro;
+  if(I > 255){
+    I = 255;
+  }
+  else if(I < -255){
+    I = -255;
+  }
+  D = erro - erro_anterior;
+  PID = (Kp*P)+(Ki*I)+(Kd*D);
+  erro_anterior = erro;
+
+}
