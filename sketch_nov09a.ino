@@ -35,6 +35,8 @@ int Kd = 35;
 int I = 0, P = 0, D = 0, PID = 0;
 int velesq = 0, veldir = 0;
 int erro = 0, erro_anterior = 0;
+int vel_A = 200;
+int vel_B = 225;
 
 
 void setup() {
@@ -81,6 +83,23 @@ void motorControl(int speedLeft, int speedRight) {
   }
   analogWrite (PINENA, speedLeft);
   analogWrite (PINENB, speedRight);
+}
+
+void controle_motor(){
+  if (PID >= 0){
+    velesq = vel_B;
+    veldir = vel_A - PID;
+  }
+  else{
+    velesq = vel_B + PID;
+    veldir = vel_A;
+  }
+  digitalWrite(IN1, HIGH);
+  digitalWrite(IN2, LOW);
+  digitalWrite(IN3, HIGH);
+  digitalWrite(IN4, LOW);
+  analogWrite(PWM_A, veldir);
+  analogWrite(PWM_B, velesq);
 }
 
 void motorOption(char option, int speedLeft, int speedRight) {
